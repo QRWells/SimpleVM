@@ -1,0 +1,66 @@
+{
+    "version": 3,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 21
+    },
+    "configurePresets": [
+        {
+            "name": "Clang-Base",
+            "displayName": "clang",
+            "hidden": true,
+            "description": "Using compilers: C = /bin/clang, CXX = /bin/clang++",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+                "CMAKE_C_COMPILER": "/bin/clang",
+                "CMAKE_CXX_COMPILER": "/bin/clang++",
+                "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake"
+            }
+        },
+        {
+            "name": "Clang-Debug",
+            "displayName": "clang-debug",
+            "description": "Using compilers: C = /bin/clang, CXX = /bin/clang++",
+            "inherits": "Clang-Base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "Clang-Release",
+            "displayName": "clang-release",
+            "description": "Using compilers: C = /bin/clang, CXX = /bin/clang++",
+            "inherits": "Clang-Base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "Build-Base",
+            "displayName": "Debug",
+            "hidden": true,
+            "cleanFirst": true,
+            "targets": [
+                "Cherry"
+            ],
+            "jobs": 8
+        },
+        {
+            "name": "Debug",
+            "displayName": "Debug",
+            "inherits": "Build-Base",
+            "verbose": true,
+            "configurePreset": "Clang-Debug"
+        },
+        {
+            "name": "Release",
+            "displayName": "Release",
+            "inherits": "Build-Base",
+            "configurePreset": "Clang-Release"
+        }
+    ],
+    "testPresets": []
+}
