@@ -11,17 +11,17 @@
  */
 
 #pragma once
-#include "Instruction.h"
 #ifndef SVM_MACHINE
 #define SVM_MACHINE
 
-#include "Frame.h"
-
-#include <array>
 #include <cstddef>
 #include <cstdint>
+#include <iostream>
 #include <stack>
 #include <vector>
+
+#include "Frame.h"
+#include "Instruction.h"
 
 namespace svm {
 class Machine {
@@ -34,7 +34,7 @@ public:
   // Run the machine
   void run();
 
-  void loadExcutableCode(std::vector<Instruction> const &code);
+  auto loadExecutableCode(std::vector<Instruction> &code) -> bool;
 
 private:
   // Indicate if the machine has halted
@@ -42,6 +42,9 @@ private:
 
   // Program counter
   uint32_t Pc{0};
+
+  // Instruction
+  Instruction CurrentInst;
 
   // Stack frames
   std::stack<Frame> Stack{};
@@ -53,17 +56,25 @@ private:
   std::vector<uint64_t> Memory;
 
   // Stack for temp variables
-  std::stack<uint64_t> TempVars;
+  std::stack<int32_t> TempVars;
+
+  // In/Out file for data input and output
+  std::istream *In{&std::cin};
+  std::ostream *Out{&std::cout};
 
   void fetch();
-  void decode();
   void execute();
 
-  auto executable(uint32_t const &addr) -> bool;
+  [[nodiscard]] auto checkBound(int32_t const &addr) const -> bool;
+  void handleOperation(Func const &func, int32_t const &value);
+  void handleBranch(Func const &func, int32_t const &value);
 
-  void push(uint32_t const &value);
-  auto pop() -> uint32_t;
-  void call();
+  auto static executable(uint32_t const &addr) -> bool;
+
+  void push(int32_t const &value);
+  auto pop() -> int32_t;
+  void dup();
+  void call(uint32_t const &func);
   void ret();
 };
 } // namespace svm
