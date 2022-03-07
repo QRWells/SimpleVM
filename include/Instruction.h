@@ -21,6 +21,7 @@ enum class Operator : uint8_t {
   NOP = 0x00,
   PUSH,
   POP,
+  DUP,
   OPERATION,
   BRANCH,
   JMP,
@@ -28,6 +29,8 @@ enum class Operator : uint8_t {
   LOAD,
   CALL,
   RET,
+  IN,
+  OUT,
   HALT = 0xff
 };
 
@@ -42,10 +45,12 @@ enum class Func : uint8_t {
   XOR,
   NOT,
 
-  EQ = 0,
-  NEQ,
-  GT,
-  LT,
+  Z = 0,
+  NZ,
+  GZ,
+  GEZ,
+  LZ,
+  LEZ
 };
 
 /**
@@ -57,9 +62,13 @@ enum class Func : uint8_t {
  */
 struct Instruction {
 public:
-  Instruction(uint64_t machineCode) : MachineCode(machineCode) {}
-  Instruction(Operator op, int32_t operand)
-      : MachineCode((static_cast<uint64_t>(op) << 56) | operand) {}
+  Instruction() = default;
+  Instruction(uint64_t const &machineCode) : MachineCode(machineCode) {}
+  Instruction(Operator const &op, int32_t const &operand = 0)
+      : MachineCode((static_cast<uint64_t>(op) << 32) | operand) {}
+  Instruction(Operator const &op, Func const &func, int32_t const &operand = 0)
+      : MachineCode((static_cast<uint64_t>(func) << 40) |
+                    (static_cast<uint64_t>(op) << 32) | operand) {}
 
   [[nodiscard]] auto op() const -> Operator {
     return static_cast<Operator>((MachineCode >> 32) & 0xff);
@@ -73,8 +82,12 @@ public:
     return static_cast<int32_t>(MachineCode & 0xffffffff);
   }
 
+  [[nodiscard]] auto rawCode() const -> uint64_t { return MachineCode; }
+
+  operator uint64_t() const { return MachineCode; }
+
 private:
-  uint64_t MachineCode;
+  uint64_t MachineCode{UINT64_MAX};
 };
 } // namespace svm
 
