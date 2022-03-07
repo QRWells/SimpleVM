@@ -22,14 +22,15 @@
 namespace svm {
 class Frame {
 public:
-  Frame(int32_t returnAddress) : ReturnAddress(returnAddress) {}
+  Frame(uint32_t returnAddress) : ReturnAddress(returnAddress) {}
 
-  void setVariable(std::string_view name, int32_t value);
-  auto getVariable(std::string_view name) -> int32_t;
+  void setVariable(int32_t const &name, int32_t const &value);
+  auto getVariable(int32_t const &name) -> int32_t;
+  auto getReturnAddress() const -> uint32_t;
 
 private:
   uint32_t ReturnAddress;
-  std::unordered_map<std::string, int32_t> Variables;
+  std::unordered_map<int32_t, int32_t> Variables;
 };
 } // namespace svm
 
