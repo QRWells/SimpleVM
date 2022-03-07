@@ -15,6 +15,7 @@
 #define SVM_INST
 
 #include <cstdint>
+#include <string>
 
 namespace svm {
 enum class Operator : uint8_t {
@@ -85,6 +86,8 @@ public:
   [[nodiscard]] auto rawCode() const -> uint64_t { return MachineCode; }
 
   operator uint64_t() const { return MachineCode; }
+
+  [[nodiscard]] auto toString() const -> std::string;
 
 private:
   uint64_t MachineCode{UINT64_MAX};

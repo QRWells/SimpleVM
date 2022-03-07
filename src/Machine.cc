@@ -10,14 +10,16 @@
  *
  */
 
-#include "Machine.h"
-#include "Frame.h"
-#include "Instruction.h"
 #include <algorithm>
 #include <cstdint>
 #include <cstdio>
+
+#include <fmt/color.h>
 #include <fmt/core.h>
 
+#include "Frame.h"
+#include "Instruction.h"
+#include "Machine.h"
 namespace svm {
 Machine::Machine(uint32_t memorySize)
     : MemorySize(memorySize), Memory(memorySize) {}
@@ -27,12 +29,19 @@ void Machine::run() {
   auto Root = Frame(UINT32_MAX);
   Stack.emplace(Root);
   while (!Halted) {
-#ifdef DEBUG
-    fmt::print("{}: {:#x}\n", Pc, CurrentInst.rawCode());
-    if (!TempVars.empty())
-      fmt::print("top: {}\n", TempVars.top());
-#endif
     fetch();
+
+#ifdef DEBUG
+    if (!TempVars.empty())
+      fmt::print(fmt::fg(fmt::color::orange),
+                 "Dbg Info: Current inst: {: >#4d}: {:.<16}Stack top :{}\n",
+                 Pc - 1, CurrentInst.toString(), TempVars.top());
+    else
+      fmt::print(fmt::fg(fmt::color::orange),
+                 "Dbg Info: Current inst: {: >#4d}: {:.<16}Stack top :{}\n",
+                 Pc - 1, CurrentInst.toString(), "empty");
+#endif
+
     execute();
   }
   Stack.pop();
@@ -108,7 +117,11 @@ void Machine::execute() {
   }
   // TODO: Store & Load
   case Operator::STORE:
+    Stack.top().setVariable(Operand, TempVars.top());
+    break;
   case Operator::LOAD:
+    TempVars.emplace(Stack.top().getVariable(Operand));
+    break;
   case Operator::HALT:
   default:
     Halted = true;
