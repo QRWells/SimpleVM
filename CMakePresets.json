@@ -44,7 +44,7 @@
             "hidden": true,
             "cleanFirst": true,
             "targets": [
-                "Cherry"
+                "SimpleVM"
             ],
             "jobs": 8
         },

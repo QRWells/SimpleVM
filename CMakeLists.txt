@@ -11,7 +11,11 @@ add_executable(SimpleVM "")
 set_target_properties(SimpleVM PROPERTIES OUTPUT_NAME "SimpleVM")
 set_target_properties(SimpleVM PROPERTIES RUNTIME_OUTPUT_DIRECTORY "build/linux/x86_64/release")
 target_include_directories(SimpleVM PRIVATE
-    src/include
+    include
+)
+target_include_directories(SimpleVM PRIVATE
+    /usr/local/include
+    vcpkg/installed/x64-linux/include
 )
 target_compile_definitions(SimpleVM PRIVATE
     ROOT
@@ -21,10 +25,19 @@ target_compile_options(SimpleVM PRIVATE
     $<$<COMPILE_LANGUAGE:C>:-m64>
     $<$<COMPILE_LANGUAGE:CXX>:-m64>
 )
+target_link_libraries(SimpleVM PRIVATE
+    fmt
+)
+target_link_directories(SimpleVM PRIVATE
+    /usr/local/lib
+)
 target_link_options(SimpleVM PRIVATE
     -m64
 )
 target_sources(SimpleVM PRIVATE
-    src/main.cc
+    src/Frame.cc
+    src/Instruction.cc
+    src/Machine.cc
+    src/Main.cc
 )
 
