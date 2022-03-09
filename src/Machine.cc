@@ -180,23 +180,17 @@ void Machine::handleBranch(const Func &func, const int32_t &value) {
   auto Condition = pop();
   bool B = false;
   switch (func) {
-  case Func::Z:
+  case Func::BZ:
     B = Condition == 0;
     break;
-  case Func::NZ:
+  case Func::BNZ:
     B = Condition != 0;
     break;
-  case Func::GZ:
+  case Func::BGZ:
     B = Condition > 0;
     break;
-  case Func::GEZ:
-    B = Condition >= 0;
-    break;
-  case Func::LZ:
+  case Func::BLZ:
     B = Condition < 0;
-    break;
-  case Func::LEZ:
-    B = Condition <= 0;
     break;
   default:
     Halted = true;

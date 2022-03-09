@@ -19,7 +19,7 @@
 
 namespace svm {
 enum class Operator : uint8_t {
-  NOP = 0x00,
+  NOP = 0x01,
   PUSH,
   POP,
   DUP,
@@ -36,7 +36,9 @@ enum class Operator : uint8_t {
 };
 
 enum class Func : uint8_t {
-  ADD = 0,
+  NONE,
+
+  ADD,
   SUB,
   MUL,
   DIV,
@@ -46,12 +48,10 @@ enum class Func : uint8_t {
   XOR,
   NOT,
 
-  Z = 0,
-  NZ,
-  GZ,
-  GEZ,
-  LZ,
-  LEZ
+  BZ,
+  BNZ,
+  BGZ,
+  BLZ,
 };
 
 /**
@@ -80,7 +80,8 @@ public:
   }
 
   [[nodiscard]] auto operand() const -> int32_t {
-    return static_cast<int32_t>(MachineCode & 0xffffffff);
+    return static_cast<int32_t>(
+        ((static_cast<int64_t>(MachineCode & 0xffffffff)) << 32) >> 32);
   }
 
   [[nodiscard]] auto rawCode() const -> uint64_t { return MachineCode; }
@@ -89,8 +90,14 @@ public:
 
   [[nodiscard]] auto toString() const -> std::string;
 
+  void setOp(Operator op) { MachineCode |= (static_cast<uint64_t>(op) << 32); }
+  void setFunc(Func func) {
+    MachineCode |= (static_cast<uint64_t>(func) << 40);
+  }
+  void setValue(int32_t value) { MachineCode |= value; }
+
 private:
-  uint64_t MachineCode{UINT64_MAX};
+  uint64_t MachineCode{0};
 };
 } // namespace svm
 
