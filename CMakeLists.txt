@@ -9,7 +9,7 @@ project(SimpleVM VERSION 0.0.1 LANGUAGES C CXX ASM)
 # target
 add_executable(SimpleVM "")
 set_target_properties(SimpleVM PROPERTIES OUTPUT_NAME "SimpleVM")
-set_target_properties(SimpleVM PROPERTIES RUNTIME_OUTPUT_DIRECTORY "build/linux/x86_64/release")
+set_target_properties(SimpleVM PROPERTIES RUNTIME_OUTPUT_DIRECTORY "build/linux/x86_64/debug")
 target_include_directories(SimpleVM PRIVATE
     include
 )
@@ -20,6 +20,7 @@ target_include_directories(SimpleVM PRIVATE
 target_compile_definitions(SimpleVM PRIVATE
     ROOT
     SRC
+    DEBUG
 )
 target_compile_options(SimpleVM PRIVATE
     $<$<COMPILE_LANGUAGE:C>:-m64>
@@ -39,5 +40,40 @@ target_sources(SimpleVM PRIVATE
     src/Instruction.cc
     src/Machine.cc
     src/Main.cc
+)
+
+# target
+add_executable(SimpleVM-as "")
+set_target_properties(SimpleVM-as PROPERTIES OUTPUT_NAME "SimpleVM-as")
+set_target_properties(SimpleVM-as PROPERTIES RUNTIME_OUTPUT_DIRECTORY "build/linux/x86_64/debug")
+target_include_directories(SimpleVM-as PRIVATE
+    include
+)
+target_include_directories(SimpleVM-as PRIVATE
+    /usr/local/include
+    vcpkg/installed/x64-linux/include
+    /home/qrwells/.xmake/packages/c/ctre/3.4.1/a62713fc2d0f4f8bb87dba7a0ecd21d7/include
+)
+target_compile_definitions(SimpleVM-as PRIVATE
+    ROOT
+    SRC
+    DEBUG
+)
+target_compile_options(SimpleVM-as PRIVATE
+    $<$<COMPILE_LANGUAGE:C>:-m64>
+    $<$<COMPILE_LANGUAGE:CXX>:-m64>
+)
+target_link_libraries(SimpleVM-as PRIVATE
+    fmt
+)
+target_link_directories(SimpleVM-as PRIVATE
+    /usr/local/lib
+)
+target_link_options(SimpleVM-as PRIVATE
+    -m64
+)
+target_sources(SimpleVM-as PRIVATE
+    src/Assembler/Assembler.cc
+    src/Assembler/Main.cc
 )
 
