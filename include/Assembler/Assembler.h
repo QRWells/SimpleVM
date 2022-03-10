@@ -31,6 +31,7 @@
 
 namespace svm {
 enum class ParseError {
+  None,
   MultipleDefinedLabel,
   ImmediateoutOfRange,
   UnknownInstruction
@@ -50,6 +51,7 @@ public:
   void parse();
   void writeTo(std::ostream &stream);
   auto isParsed() -> bool;
+  auto getError() const -> std::string;
 
 private:
   int static constexpr LABEL_PLACEHOLDER = -1;

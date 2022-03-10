@@ -20,6 +20,8 @@
 #include <string_view>
 #include <variant>
 
+#include <fmt/core.h>
+
 #include "Assembler/Assembler.h"
 #include "Assembler/Exceptions/MultipleDefineException.h"
 #include "Assembler/Util.h"
@@ -32,6 +34,13 @@ Assembler::Assembler(std::string_view code)
 Assembler::Assembler(std::ifstream const &code) { Code << code.rdbuf(); }
 
 auto Assembler::isParsed() -> bool { return !Error.has_value(); }
+
+auto Assembler::getError() const -> std::string {
+  return fmt::format(
+      "{} at line {}",
+      magic_enum::enum_name<svm::ParseError>(Error.value_or(ParseError::None)),
+      CurrentLine);
+}
 
 void Assembler::parse() {
   using namespace std;
@@ -109,7 +118,6 @@ auto Assembler::handleInstruction(std::string inst) -> bool {
   using namespace std;
   auto [all_op, op, operand] = INST(inst);
 
-  bool IsLabel{false};
   std::variant<int, std::string> Value;
   PreInst Res{};
 
@@ -119,8 +127,9 @@ auto Assembler::handleInstruction(std::string inst) -> bool {
     auto Pos = tryGetPosition(operand.to_string());
     if (!Pos.has_value()) {
       trySetLabel(operand.to_string(), InstPos);
-      Value = operand.to_string();
-      IsLabel = true;
+      auto Temp = operand.to_string();
+      ltrim(Temp);
+      Value = Temp;
     }
   } catch (out_of_range &Ex) {
     Error = ParseError::ImmediateoutOfRange;
@@ -154,6 +163,9 @@ auto Assembler::tryGetPosition(std::string_view label) -> std::optional<int> {
 }
 
 auto Assembler::trySetLabel(std::string_view label, int const &value) -> bool {
+#ifdef DEBUG
+  fmt::print("Trying to set label:{} with {}\n", label, value);
+#endif
   if (LabelMap.contains(label) && LabelMap.at(label) != LABEL_PLACEHOLDER)
     return false;
   LabelMap.emplace(label, value);
