@@ -21,6 +21,7 @@
 #include <string_view>
 
 #include <ctre.hpp>
+#include <fmt/core.h>
 
 #include "Instruction.h"
 
@@ -28,7 +29,7 @@ namespace svm {
 
 auto static constexpr FILTER =
     ctre::match<R"(^([^\d]\w+\s*:)?\s*([^/;#\n\r]*)?$)">;
-auto static constexpr INST = ctre::match<R"(^([a-zA-Z]{2,5})(\s+\S+)?$)">;
+auto static constexpr INST = ctre::match<R"(^([a-zA-Z]{2,5})(\s+\S+)?\s*$)">;
 
 inline auto extractFileName(std::string_view filename) -> std::string {
   auto Dot = filename.find_last_of('.');
@@ -59,15 +60,14 @@ static inline void trim(std::string &s) {
   rtrim(s);
 }
 
-inline auto preProcess(std::string_view line)
-    -> std::optional<std::string_view> {
+inline auto preProcess(std::string_view line) -> std::optional<std::string> {
   std::string Line{line.begin(), line.end()};
   trim(Line);
   if (Line.empty())
     return std::nullopt;
   if (auto Pos = Line.find_first_of(";#/"); Pos != std::string::npos)
-    return {{Line.substr(0, Pos)}};
-  return {{Line}};
+    return Line.substr(0, Pos);
+  return Line;
 }
 } // namespace svm
 
