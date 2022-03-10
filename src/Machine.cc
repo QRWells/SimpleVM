@@ -47,7 +47,7 @@ void Machine::run() {
   Stack.pop();
 }
 
-auto Machine::loadExecutableCode(std::vector<Instruction> &code) -> bool {
+auto Machine::loadExecutableCode(std::vector<Instruction> const &code) -> bool {
   if (code.size() > MemorySize)
     return false;
   std::copy(code.cbegin(), code.cend(), Memory.begin());

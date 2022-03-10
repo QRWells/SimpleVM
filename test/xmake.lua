@@ -11,7 +11,7 @@ target("Machine-test")
 
     add_files("$(curdir)/test/Machine/*.cc")
     add_files("$(curdir)/src/*.cc")
-    remove_files("$(curdir)/src/Main.cc")
+    remove_files("$(curdir)/src/main.cc")
 
     add_packages("fmt", "vcpkg::magic-enum")
 target_end()
