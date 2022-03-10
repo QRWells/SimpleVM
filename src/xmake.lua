@@ -2,14 +2,9 @@ add_defines("SRC")
 
 add_requires("fmt", "vcpkg::magic-enum", "ctre")
 
-if is_mode("debug") then
-    add_defines("DEBUG")
-end
-
 target("SimpleVM")
     set_default(true)
     set_kind("binary")
-    set_languages("c17", "gnu++20")
 
     add_includedirs("$(curdir)/include")
 
@@ -21,7 +16,6 @@ target_end()
 
 target("SimpleVM-as")
     set_kind("binary")
-    set_languages("c17", "gnu++20")
 
     add_includedirs("$(curdir)/include")
 
