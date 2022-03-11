@@ -29,10 +29,14 @@
 #include "magic_enum.hpp"
 
 namespace svm {
-Assembler::Assembler(std::string_view code)
-    : Code(std::string(code), std::ios_base::in) {}
+Assembler::Assembler(std::string const &code) : Code(code, std::ios_base::in) {}
 Assembler::Assembler(std::ifstream const &code) { Code << code.rdbuf(); }
+void Assembler::loadCode(std::string const &code) {
+  Code = std::stringstream{code, std::ios_base::in};
+}
+void Assembler::loadCode(std::ifstream const &code) { Code << code.rdbuf(); }
 
+auto Assembler::isParsable() -> bool { return Code.rdbuf()->in_avail() != 0; }
 auto Assembler::isParsed() -> bool { return !Error.has_value(); }
 
 auto Assembler::getError() const -> std::string {
@@ -44,6 +48,8 @@ auto Assembler::getError() const -> std::string {
 
 void Assembler::parse() {
   using namespace std;
+  if (!isParsable())
+    return;
   string Line{};
   while (getline(Code, Line)) {
     ++CurrentLine;
@@ -88,16 +94,21 @@ void Assembler::writeTo(std::ostream &stream) {
     if (Value == nullptr) // Value is number
       Next.setValue(std::get<int>(I.second.Value));
     else { // Value is string(label)
-      auto LabelPos = tryGetPosition(std::get<std::string>(I.second.Value));
+      auto LabelPos =
+          tryGetPosition(std::get<std::string>(I.second.Value)).value();
       switch (Op) {
       case Operator::BRANCH:
-        Next.setValue(LabelPos.value() - Pos);
+        Next.setValue(LabelPos - Pos);
+        break;
       default:
-        Next.setValue(LabelPos.value());
+        Next.setValue(LabelPos);
       }
     }
-    std::to_chars(Buffer.begin(), Buffer.end(), Next.rawCode());
-    stream.write(Buffer.data(), Size);
+    fmt::print("{:#016x}\n", Next.rawCode());
+    auto Raw = Next.rawCode();
+    stream.write(reinterpret_cast<char *>(&Raw), sizeof(Raw));
+    // splitValueToBytes<decltype(Next.rawCode())>(Buffer, Next.rawCode());
+    // stream.write(Buffer.data(), sizeof(Next.rawCode()));
   }
 }
 
@@ -121,20 +132,22 @@ auto Assembler::handleInstruction(std::string inst) -> bool {
   std::variant<int, std::string> Value;
   PreInst Res{};
 
-  try {
-    Value = stoi(operand.to_string());
-  } catch (invalid_argument &Ex) {
-    auto Pos = tryGetPosition(operand.to_string());
-    if (!Pos.has_value()) {
-      trySetLabel(operand.to_string(), InstPos);
-      auto Temp = operand.to_string();
-      ltrim(Temp);
+  auto Temp = operand.to_string();
+  trim(Temp);
+  if (!Temp.empty())
+    try {
+      Value = stoi(Temp);
+    } catch (std::invalid_argument &Ex) {
+      auto Pos = tryGetPosition(Temp);
+      if (!Pos.has_value())
+        trySetLabel(Temp, LABEL_PLACEHOLDER);
       Value = Temp;
+    } catch (std::out_of_range &Ex) {
+      Error = ParseError::ImmediateoutOfRange;
+      return false;
     }
-  } catch (out_of_range &Ex) {
-    Error = ParseError::ImmediateoutOfRange;
-    return false;
-  }
+  else
+    Value = 0;
 
   Res.Value = Value;
 
@@ -156,19 +169,21 @@ auto Assembler::handleInstruction(std::string inst) -> bool {
   return true;
 }
 
-auto Assembler::tryGetPosition(std::string_view label) -> std::optional<int> {
+auto Assembler::tryGetPosition(std::string const &label) -> std::optional<int> {
   if (LabelMap.contains(label))
     return LabelMap.at(label);
   return std::nullopt;
 }
 
-auto Assembler::trySetLabel(std::string_view label, int const &value) -> bool {
-#ifdef DEBUG
-  fmt::print("Trying to set label:{} with {}\n", label, value);
-#endif
-  if (LabelMap.contains(label) && LabelMap.at(label) != LABEL_PLACEHOLDER)
-    return false;
-  LabelMap.emplace(label, value);
+auto Assembler::trySetLabel(std::string const &label, int const &value)
+    -> bool {
+  if (LabelMap.contains(label)) {
+    if (LabelMap.at(label) == LABEL_PLACEHOLDER)
+      LabelMap.at(label) = value;
+    else
+      return false;
+  }
+  LabelMap.insert({label, value});
   return true;
 }
 } // namespace svm

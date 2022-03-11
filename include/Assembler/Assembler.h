@@ -45,11 +45,15 @@ struct PreInst {
 
 class Assembler {
 public:
-  Assembler(std::string_view code);
+  Assembler() = default;
+  Assembler(std::string const &code);
   Assembler(std::ifstream const &code);
 
+  void loadCode(std::string const &code);
+  void loadCode(std::ifstream const &code);
   void parse();
   void writeTo(std::ostream &stream);
+  auto isParsable() -> bool;
   auto isParsed() -> bool;
   auto getError() const -> std::string;
 
@@ -60,11 +64,11 @@ private:
   int InstPos{0};
   std::optional<ParseError> Error{std::nullopt};
   std::stringstream Code;
-  std::unordered_map<std::string_view, int> LabelMap;
+  std::unordered_map<std::string, int> LabelMap;
   std::map<int, PreInst> InstructionList;
 
-  auto tryGetPosition(std::string_view label) -> std::optional<int>;
-  auto trySetLabel(std::string_view label, int const &value) -> bool;
+  auto tryGetPosition(std::string const &label) -> std::optional<int>;
+  auto trySetLabel(std::string const &label, int const &value) -> bool;
 
   void fetchChar();
 

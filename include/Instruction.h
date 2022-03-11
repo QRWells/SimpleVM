@@ -32,7 +32,7 @@ enum class Operator : uint8_t {
   RET,
   IN,
   OUT,
-  HALT = 0xff
+  HALT = 0x7f
 };
 
 enum class Func : uint8_t {
@@ -90,11 +90,15 @@ public:
 
   [[nodiscard]] auto toString() const -> std::string;
 
-  void setOp(Operator op) { MachineCode |= (static_cast<uint64_t>(op) << 32); }
-  void setFunc(Func func) {
+  void setOp(Operator const &op) {
+    MachineCode |= (static_cast<uint64_t>(op) << 32);
+  }
+  void setFunc(Func const &func) {
     MachineCode |= (static_cast<uint64_t>(func) << 40);
   }
-  void setValue(int32_t value) { MachineCode |= value; }
+  void setValue(int32_t const &value) {
+    MachineCode |= static_cast<int64_t>(value) & 0xffffffff;
+  }
 
 private:
   uint64_t MachineCode{0};
