@@ -10,23 +10,21 @@
  *
  */
 
-#include <charconv>
 #include <cstdint>
 #include <cstdlib>
 #include <ios>
 #include <optional>
-#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <variant>
 
 #include <fmt/core.h>
+#include <magic_enum.hpp>
 
 #include "Assembler/Assembler.h"
 #include "Assembler/Exceptions/MultipleDefineException.h"
 #include "Assembler/Util.h"
 #include "Instruction.h"
-#include "magic_enum.hpp"
 
 namespace svm {
 Assembler::Assembler(std::string const &code) : Code(code, std::ios_base::in) {}
@@ -37,7 +35,9 @@ void Assembler::loadCode(std::string const &code) {
 void Assembler::loadCode(std::ifstream const &code) { Code << code.rdbuf(); }
 
 auto Assembler::isParsable() -> bool { return Code.rdbuf()->in_avail() != 0; }
-auto Assembler::isParsed() -> bool { return !Error.has_value(); }
+auto Assembler::isParsed() -> bool {
+  return !Error.has_value() || Error.value() == ParseError::None;
+}
 
 auto Assembler::getError() const -> std::string {
   return fmt::format(
@@ -104,11 +104,8 @@ void Assembler::writeTo(std::ostream &stream) {
         Next.setValue(LabelPos);
       }
     }
-    fmt::print("{:#016x}\n", Next.rawCode());
     auto Raw = Next.rawCode();
     stream.write(reinterpret_cast<char *>(&Raw), sizeof(Raw));
-    // splitValueToBytes<decltype(Next.rawCode())>(Buffer, Next.rawCode());
-    // stream.write(Buffer.data(), sizeof(Next.rawCode()));
   }
 }
 
