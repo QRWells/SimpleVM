@@ -14,11 +14,15 @@
 #ifndef SVM_AS_UTIL
 #define SVM_AS_UTIL
 
+#include <array>
+#include <bit>
 #include <cctype>
+#include <cstddef>
 #include <locale>
 #include <optional>
 #include <string>
 #include <string_view>
+#include <type_traits>
 
 #include <ctre.hpp>
 #include <fmt/core.h>
@@ -68,6 +72,35 @@ inline auto preProcess(std::string_view line) -> std::optional<std::string> {
   if (auto Pos = Line.find_first_of(";#/"); Pos != std::string::npos)
     return Line.substr(0, Pos);
   return Line;
+}
+
+template <typename T, size_t size>
+requires std::is_arithmetic_v<T> &&
+    (size >= sizeof(T)) void splitValueToBytes(std::array<char, size> &des,
+                                               T const &value) {
+  if constexpr (std::endian::native == std::endian::big)
+    for (auto I = 0; I < sizeof(value); ++I)
+      des.data()[I] = value >> (I * 8);
+
+  else if constexpr (std::endian::native == std::endian::little)
+    for (size_t I = 0; I < sizeof(value); ++I)
+      des.data()[I] = value >> ((sizeof(T) - 1) * 8 - I * 8);
+}
+
+template <typename T, size_t size>
+requires std::is_arithmetic_v<T> &&
+    (sizeof(T) >=
+     size) auto mergeBytesToValue(std::array<char, size> const &src) -> T {
+  T Value{0};
+  if constexpr (std::endian::native == std::endian::big)
+    for (auto I = 0; I < size; ++I)
+      Value |= (src.data()[I] << (I * 8));
+
+  else if constexpr (std::endian::native == std::endian::little)
+    for (size_t I = 0; I < size; ++I)
+      Value |= (src.data()[I] << ((sizeof(T) - 1) * 8 - I * 8));
+
+  return Value;
 }
 } // namespace svm
 
