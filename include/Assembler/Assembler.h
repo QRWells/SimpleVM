@@ -11,8 +11,6 @@
  */
 
 #pragma once
-#include "Assembler/Exceptions/MultipleDefineException.h"
-#include <ostream>
 #ifndef SVM_AS_ASSEMBLER
 #define SVM_AS_ASSEMBLER
 
@@ -20,6 +18,7 @@
 #include <fstream>
 #include <map>
 #include <optional>
+#include <ostream>
 #include <sstream>
 #include <string>
 #include <string_view>

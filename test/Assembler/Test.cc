@@ -3,12 +3,12 @@
 #include <iostream>
 #include <sstream>
 
-#include "Verifier.h"
-#include "magic_enum.hpp"
 #include <fmt/core.h>
+#include <magic_enum.hpp>
 
 #include "./Programs.h"
 #include "Assembler/Assembler.h"
+#include "Verifier.h"
 
 using namespace std;
 

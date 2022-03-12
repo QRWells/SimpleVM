@@ -1,6 +1,7 @@
-#include "Frame.h"
 #include <cstdint>
 #include <string>
+
+#include "Frame.h"
 
 namespace svm {
 auto Frame::getReturnAddress() const -> uint32_t { return ReturnAddress; }

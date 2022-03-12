@@ -1,7 +1,9 @@
-#include "Instruction.h"
+#include <string>
+
 #include <fmt/core.h>
 #include <magic_enum.hpp>
-#include <string>
+
+#include "Instruction.h"
 
 namespace svm {
 auto Instruction::toString() const -> std::string {
