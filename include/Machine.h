@@ -34,7 +34,7 @@ public:
   // Run the machine
   void run();
 
-  auto loadExecutableCode(std::vector<Instruction> const &code) -> bool;
+  auto loadExecutableCode(CodeList const &code) -> bool;
 
 private:
   // Indicate if the machine has halted

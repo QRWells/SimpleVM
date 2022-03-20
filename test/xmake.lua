@@ -14,7 +14,7 @@ target("Machine-test")
     remove_files("$(curdir)/src/Main.cc")
     remove_files("$(curdir)/src/Assembler/Main.cc")
 
-    add_packages("fmt", "vcpkg::magic-enum")
+    add_packages("fmt", "vcpkg::magic-enum", "ctre")
 target_end()
 
 target("Assembler-test")

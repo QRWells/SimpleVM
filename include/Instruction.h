@@ -16,8 +16,11 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
 
 namespace svm {
+using code_t = uint64_t;
+
 enum class Operator : uint8_t {
   NOP = 0x01,
   PUSH,
@@ -64,12 +67,12 @@ enum class Func : uint8_t {
 struct Instruction {
 public:
   Instruction() = default;
-  Instruction(uint64_t const &machineCode) : MachineCode(machineCode) {}
+  Instruction(code_t const &machineCode) : MachineCode(machineCode) {}
   Instruction(Operator const &op, int32_t const &operand = 0)
-      : MachineCode((static_cast<uint64_t>(op) << 32) | operand) {}
+      : MachineCode((static_cast<code_t>(op) << 32) | operand) {}
   Instruction(Operator const &op, Func const &func, int32_t const &operand = 0)
-      : MachineCode((static_cast<uint64_t>(func) << 40) |
-                    (static_cast<uint64_t>(op) << 32) | operand) {}
+      : MachineCode((static_cast<code_t>(func) << 40) |
+                    (static_cast<code_t>(op) << 32) | operand) {}
 
   [[nodiscard]] auto op() const -> Operator {
     return static_cast<Operator>((MachineCode >> 32) & 0xff);
@@ -84,25 +87,27 @@ public:
         ((static_cast<int64_t>(MachineCode & 0xffffffff)) << 32) >> 32);
   }
 
-  [[nodiscard]] auto rawCode() const -> uint64_t { return MachineCode; }
+  [[nodiscard]] auto rawCode() const -> code_t { return MachineCode; }
 
-  operator uint64_t() const { return MachineCode; }
+  operator code_t() const { return MachineCode; }
 
   [[nodiscard]] auto toString() const -> std::string;
 
   void setOp(Operator const &op) {
-    MachineCode |= (static_cast<uint64_t>(op) << 32);
+    MachineCode |= (static_cast<code_t>(op) << 32);
   }
   void setFunc(Func const &func) {
-    MachineCode |= (static_cast<uint64_t>(func) << 40);
+    MachineCode |= (static_cast<code_t>(func) << 40);
   }
   void setValue(int32_t const &value) {
     MachineCode |= static_cast<int64_t>(value) & 0xffffffff;
   }
 
 private:
-  uint64_t MachineCode{0};
+  code_t MachineCode{0};
 };
+
+using CodeList = std::vector<Instruction>;
 } // namespace svm
 
 #endif

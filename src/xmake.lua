@@ -11,7 +11,7 @@ target("SimpleVM")
     add_files("**.cc")
 	remove_files("$(curdir)/src/Assembler/*.cc")
 
-    add_packages("fmt", "vcpkg::magic-enum")
+    add_packages("fmt", "vcpkg::magic-enum", "ctre")
 target_end()
 
 target("SimpleVM-as")
