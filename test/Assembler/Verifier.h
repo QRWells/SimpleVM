@@ -11,12 +11,13 @@
  */
 
 #pragma once
-#include "Assembler/Assembler.h"
-#include "TestCase.h"
 #ifndef TEST_AS_VERIFIER
 #define TEST_AS_VERIFIER
 
 #include <sstream>
+
+#include "Assembler/Assembler.h"
+#include "TestCase.h"
 
 namespace svm {
 class Verifier {

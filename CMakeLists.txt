@@ -7,6 +7,48 @@ cmake_minimum_required(VERSION 3.13.0)
 project(SimpleVM VERSION 0.0.1 LANGUAGES C CXX ASM)
 
 # target
+add_executable(Machine-test "")
+set_target_properties(Machine-test PROPERTIES OUTPUT_NAME "Machine-test")
+set_target_properties(Machine-test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "build/linux/x86_64/debug")
+target_include_directories(Machine-test PRIVATE
+    include
+)
+target_include_directories(Machine-test PRIVATE
+    /usr/local/include
+    vcpkg/installed/x64-linux/include
+)
+target_compile_definitions(Machine-test PRIVATE
+    ROOT
+    DEBUG
+    TEST
+)
+target_compile_options(Machine-test PRIVATE
+    $<$<COMPILE_LANGUAGE:C>:-m64>
+    $<$<COMPILE_LANGUAGE:CXX>:-m64>
+)
+if(MSVC)
+    target_compile_options(Machine-test PRIVATE $<$<CONFIG:Debug>:-Od>)
+else()
+    target_compile_options(Machine-test PRIVATE -O0)
+endif()
+target_link_libraries(Machine-test PRIVATE
+    fmt
+)
+target_link_directories(Machine-test PRIVATE
+    /usr/local/lib
+)
+target_link_options(Machine-test PRIVATE
+    -m64
+)
+target_sources(Machine-test PRIVATE
+    test/Machine/Test.cc
+    src/Assembler/Assembler.cc
+    src/Frame.cc
+    src/Instruction.cc
+    src/Machine.cc
+)
+
+# target
 add_executable(SimpleVM-as "")
 set_target_properties(SimpleVM-as PROPERTIES OUTPUT_NAME "SimpleVM-as")
 set_target_properties(SimpleVM-as PROPERTIES RUNTIME_OUTPUT_DIRECTORY "build/linux/x86_64/debug")
@@ -43,49 +85,6 @@ target_link_options(SimpleVM-as PRIVATE
 target_sources(SimpleVM-as PRIVATE
     src/Assembler/Assembler.cc
     src/Assembler/Main.cc
-)
-
-# target
-add_executable(Assembler-test "")
-set_target_properties(Assembler-test PROPERTIES OUTPUT_NAME "Assembler-test")
-set_target_properties(Assembler-test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "build/linux/x86_64/debug")
-target_include_directories(Assembler-test PRIVATE
-    include
-)
-target_include_directories(Assembler-test PRIVATE
-    /usr/local/include
-    vcpkg/installed/x64-linux/include
-)
-target_compile_definitions(Assembler-test PRIVATE
-    ROOT
-    DEBUG
-    TEST
-)
-target_compile_options(Assembler-test PRIVATE
-    $<$<COMPILE_LANGUAGE:C>:-m64>
-    $<$<COMPILE_LANGUAGE:CXX>:-m64>
-)
-if(MSVC)
-    target_compile_options(Assembler-test PRIVATE $<$<CONFIG:Debug>:-Od>)
-else()
-    target_compile_options(Assembler-test PRIVATE -O0)
-endif()
-target_link_libraries(Assembler-test PRIVATE
-    fmt
-)
-target_link_directories(Assembler-test PRIVATE
-    /usr/local/lib
-)
-target_link_options(Assembler-test PRIVATE
-    -m64
-)
-target_sources(Assembler-test PRIVATE
-    test/Assembler/Test.cc
-    test/Assembler/Verifier.cc
-    src/Assembler/Assembler.cc
-    src/Frame.cc
-    src/Instruction.cc
-    src/Machine.cc
 )
 
 # target
@@ -130,41 +129,42 @@ target_sources(SimpleVM PRIVATE
 )
 
 # target
-add_executable(Machine-test "")
-set_target_properties(Machine-test PROPERTIES OUTPUT_NAME "Machine-test")
-set_target_properties(Machine-test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "build/linux/x86_64/debug")
-target_include_directories(Machine-test PRIVATE
+add_executable(Assembler-test "")
+set_target_properties(Assembler-test PROPERTIES OUTPUT_NAME "Assembler-test")
+set_target_properties(Assembler-test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "build/linux/x86_64/debug")
+target_include_directories(Assembler-test PRIVATE
     include
 )
-target_include_directories(Machine-test PRIVATE
+target_include_directories(Assembler-test PRIVATE
     /usr/local/include
     vcpkg/installed/x64-linux/include
 )
-target_compile_definitions(Machine-test PRIVATE
+target_compile_definitions(Assembler-test PRIVATE
     ROOT
     DEBUG
     TEST
 )
-target_compile_options(Machine-test PRIVATE
+target_compile_options(Assembler-test PRIVATE
     $<$<COMPILE_LANGUAGE:C>:-m64>
     $<$<COMPILE_LANGUAGE:CXX>:-m64>
 )
 if(MSVC)
-    target_compile_options(Machine-test PRIVATE $<$<CONFIG:Debug>:-Od>)
+    target_compile_options(Assembler-test PRIVATE $<$<CONFIG:Debug>:-Od>)
 else()
-    target_compile_options(Machine-test PRIVATE -O0)
+    target_compile_options(Assembler-test PRIVATE -O0)
 endif()
-target_link_libraries(Machine-test PRIVATE
+target_link_libraries(Assembler-test PRIVATE
     fmt
 )
-target_link_directories(Machine-test PRIVATE
+target_link_directories(Assembler-test PRIVATE
     /usr/local/lib
 )
-target_link_options(Machine-test PRIVATE
+target_link_options(Assembler-test PRIVATE
     -m64
 )
-target_sources(Machine-test PRIVATE
-    test/Machine/Test.cc
+target_sources(Assembler-test PRIVATE
+    test/Assembler/Test.cc
+    test/Assembler/Verifier.cc
     src/Assembler/Assembler.cc
     src/Frame.cc
     src/Instruction.cc

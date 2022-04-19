@@ -115,7 +115,6 @@ void Machine::execute() {
     *Out << V << std::endl;
     break;
   }
-  // TODO: Store & Load
   case Operator::STORE:
     Stack.top().setVariable(Operand, TempVars.top());
     break;

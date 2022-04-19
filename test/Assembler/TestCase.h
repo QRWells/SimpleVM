@@ -11,10 +11,10 @@
  */
 
 #pragma once
-#include <string>
 #ifndef TEST_AS_TESTCASE
 #define TEST_AS_TESTCASE
 
+#include <string>
 #include <vector>
 
 #include "Instruction.h"

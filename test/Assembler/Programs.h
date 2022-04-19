@@ -1,4 +1,3 @@
-
 #include "Instruction.h"
 #include "Machine.h"
 #include "TestCase.h"
