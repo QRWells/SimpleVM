@@ -21,8 +21,7 @@
 #include "Instruction.h"
 #include "Machine.h"
 namespace svm {
-Machine::Machine(uint32_t memorySize)
-    : MemorySize(memorySize), Memory(memorySize) {}
+Machine::Machine(uint32_t memorySize) : MemorySize(memorySize), Memory(memorySize) {}
 Machine::~Machine() = default;
 
 void Machine::run() {
@@ -33,13 +32,11 @@ void Machine::run() {
 
 #ifdef DEBUG
     if (!TempVars.empty())
-      fmt::print(fmt::fg(fmt::color::orange),
-                 "Dbg Info: Current inst: {: >#4d}: {:.<16}Stack top :{}\n",
-                 Pc - 1, CurrentInst.toString(), TempVars.top());
+      fmt::print(fmt::fg(fmt::color::orange), "Dbg Info: Current inst: {: >#4d}: {:.<16}Stack top :{}\n", Pc - 1,
+                 CurrentInst.toString(), TempVars.top());
     else
-      fmt::print(fmt::fg(fmt::color::orange),
-                 "Dbg Info: Current inst: {: >#4d}: {:.<16}Stack top :{}\n",
-                 Pc - 1, CurrentInst.toString(), "empty");
+      fmt::print(fmt::fg(fmt::color::orange), "Dbg Info: Current inst: {: >#4d}: {:.<16}Stack top :{}\n", Pc - 1,
+                 CurrentInst.toString(), "empty");
 #endif
 
     execute();
@@ -63,8 +60,8 @@ void Machine::fetch() {
 
 void Machine::execute() {
   // Decode
-  auto const Op = CurrentInst.op();
-  auto const Func = CurrentInst.func();
+  auto const Op      = CurrentInst.op();
+  auto const Func    = CurrentInst.func();
   auto const Operand = CurrentInst.operand();
 
   // Execute
@@ -132,9 +129,7 @@ auto Machine::executable(uint32_t const &addr) -> bool {
   return false;
 }
 
-auto Machine::checkBound(int32_t const &addr) const -> bool {
-  return addr <= MemorySize && addr > 0;
-}
+auto Machine::checkBound(int32_t const &addr) const -> bool { return addr <= MemorySize && addr > 0; }
 
 void Machine::push(int32_t const &value) { TempVars.push(value); }
 
@@ -175,9 +170,9 @@ void Machine::ret() {
   Stack.pop();
 }
 
-void Machine::handleBranch(const Func &func, const int32_t &value) {
+void Machine::handleBranch(Func const &func, int32_t const &value) {
   auto Condition = pop();
-  bool B = false;
+  bool B         = false;
   switch (func) {
   case Func::BZ:
     B = Condition == 0;
@@ -198,14 +193,14 @@ void Machine::handleBranch(const Func &func, const int32_t &value) {
     Pc = static_cast<uint32_t>(static_cast<int32_t>(Pc) + value - 1);
 }
 
-void Machine::handleOperation(const Func &func, const int32_t &value) {
+void Machine::handleOperation(Func const &func, int32_t const &value) {
   auto B = pop();
   if (func == Func::NOT) {
     B = B == 0 ? 1 : 0;
     push(B);
     return;
   }
-  auto A = pop();
+  auto        A = pop();
   decltype(B) C = 0;
   switch (func) {
   case Func::ADD:

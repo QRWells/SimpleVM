@@ -44,8 +44,7 @@ auto main(int argc, char *const argv[]) -> int {
   if (!Assembler.isParsed())
     fmt::print(fmt::fg(fmt::color::red), "Error :{}\n", Assembler.getError());
 
-  ofstream Code{svm::extractFileName(Args[1]) + ".bin",
-                ios_base::out | ios_base::binary};
+  ofstream Code{svm::extractFileName(Args[1]) + ".bin", ios_base::out | ios_base::binary};
 
   Assembler.writeTo(Code);
   return 0;

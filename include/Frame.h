@@ -29,7 +29,7 @@ public:
   auto getReturnAddress() const -> uint32_t;
 
 private:
-  uint32_t ReturnAddress;
+  uint32_t                             ReturnAddress;
   std::unordered_map<int32_t, int32_t> Variables;
 };
 } // namespace svm

@@ -29,16 +29,11 @@
 #include "Instruction.h"
 
 namespace svm {
-enum class ParseError {
-  None,
-  MultipleDefinedLabel,
-  ImmediateoutOfRange,
-  UnknownInstruction
-};
+enum class ParseError { None, MultipleDefinedLabel, ImmediateoutOfRange, UnknownInstruction };
 
 struct PreInst {
-  Operator Op;
-  Func Func{Func::NONE};
+  Operator                       Op;
+  Func                           Func{Func::NONE};
   std::variant<int, std::string> Value;
 };
 
@@ -59,12 +54,12 @@ public:
 private:
   int static constexpr LABEL_PLACEHOLDER = -1;
 
-  int CurrentLine{0};
-  int InstPos{0};
-  std::optional<ParseError> Error{std::nullopt};
-  std::stringstream Code;
+  int                                  CurrentLine{0};
+  int                                  InstPos{0};
+  std::optional<ParseError>            Error{std::nullopt};
+  std::stringstream                    Code;
   std::unordered_map<std::string, int> LabelMap;
-  std::map<int, PreInst> InstructionList;
+  std::map<int, PreInst>               InstructionList;
 
   auto tryGetPosition(std::string const &label) -> std::optional<int>;
   auto trySetLabel(std::string const &label, int const &value) -> bool;

@@ -66,8 +66,8 @@ private:
   void execute();
 
   [[nodiscard]] auto checkBound(int32_t const &addr) const -> bool;
-  void handleOperation(Func const &func, int32_t const &value);
-  void handleBranch(Func const &func, int32_t const &value);
+  void               handleOperation(Func const &func, int32_t const &value);
+  void               handleBranch(Func const &func, int32_t const &value);
 
   auto static executable(uint32_t const &addr) -> bool;
 

@@ -7,7 +7,7 @@
 
 namespace svm {
 auto Instruction::toString() const -> std::string {
-  auto Op = magic_enum::enum_name(op());
+  auto Op   = magic_enum::enum_name(op());
   auto Func = magic_enum::enum_name(func());
   if (op() == Operator::OPERATION or op() == Operator::BRANCH)
     return fmt::format("{: <5} {}", Func, operand());
