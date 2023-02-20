@@ -1,6 +1,6 @@
 add_defines("SRC")
 
-add_requires("fmt", "vcpkg::magic-enum", "ctre")
+add_requires("fmt", "magic_enum", "ctre")
 
 target("SimpleVM")
     set_default(true)
@@ -11,7 +11,7 @@ target("SimpleVM")
     add_files("**.cc")
 	remove_files("$(curdir)/src/Assembler/*.cc")
 
-    add_packages("fmt", "vcpkg::magic-enum", "ctre")
+    add_packages("fmt", "magic_enum", "ctre")
 target_end()
 
 target("SimpleVM-as")
@@ -21,5 +21,5 @@ target("SimpleVM-as")
 
     add_files("$(curdir)/src/Assembler/**.cc")
 
-    add_packages("fmt", "vcpkg::magic-enum", "ctre")
+    add_packages("fmt", "magic_enum", "ctre")
 target_end()

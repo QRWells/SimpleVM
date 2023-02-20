@@ -23,3 +23,5 @@ elseif is_mode("release") then
 end
 
 includes("src", "test")
+
+add_defines("FMT_HEADER_ONLY")

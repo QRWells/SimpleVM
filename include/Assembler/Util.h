@@ -31,9 +31,8 @@
 
 namespace svm {
 
-auto static constexpr FILTER =
-    ctre::match<R"(^([^\d]\w+\s*:)?\s*([^/;#\n\r]*)?$)">;
-auto static constexpr INST = ctre::match<R"(^([a-zA-Z]{2,5})(\s+\S+)?\s*$)">;
+auto static constexpr FILTER = ctre::match<R"(^([^\d]\w+\s*:)?\s*([^/;#\n\r]*)?$)">;
+auto static constexpr INST   = ctre::match<R"(^([a-zA-Z]{2,5})(\s+\S+)?\s*$)">;
 
 inline auto extractFileName(std::string_view filename) -> std::string {
   auto Dot = filename.find_last_of('.');
@@ -45,17 +44,12 @@ inline auto extractFileName(std::string_view filename) -> std::string {
 
 // trim from start (in place)
 static inline void ltrim(std::string &s) {
-  s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
-            return std::isspace(ch) == 0;
-          }));
+  s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) { return std::isspace(ch) == 0; }));
 }
 
 // trim from end (in place)
 static inline void rtrim(std::string &s) {
-  s.erase(std::find_if(s.rbegin(), s.rend(),
-                       [](unsigned char ch) { return std::isspace(ch) == 0; })
-              .base(),
-          s.end());
+  s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) { return std::isspace(ch) == 0; }).base(), s.end());
 }
 
 // trim from both ends (in place)
@@ -75,9 +69,8 @@ inline auto preProcess(std::string_view line) -> std::optional<std::string> {
 }
 
 template <typename T, size_t size>
-requires std::is_arithmetic_v<T> &&
-    (size >= sizeof(T)) void splitValueToBytes(std::array<char, size> &des,
-                                               T const &value) {
+  requires std::is_arithmetic_v<T> && (size >= sizeof(T))
+void splitValueToBytes(std::array<char, size> &des, T const &value) {
   if constexpr (std::endian::native == std::endian::big)
     for (auto I = 0; I < sizeof(value); ++I)
       des.data()[I] = value >> (I * 8);
@@ -88,9 +81,8 @@ requires std::is_arithmetic_v<T> &&
 }
 
 template <typename T, size_t size>
-requires std::is_arithmetic_v<T> &&
-    (sizeof(T) >=
-     size) auto mergeBytesToValue(std::array<char, size> const &src) -> T {
+  requires std::is_arithmetic_v<T> && (sizeof(T) >= size)
+                                    auto mergeBytesToValue(std::array<char, size> const &src) -> T {
   T Value{0};
   if constexpr (std::endian::native == std::endian::big)
     for (auto I = 0; I < size; ++I)

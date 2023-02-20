@@ -22,28 +22,21 @@
 #include <magic_enum.hpp>
 
 #include "Assembler/Assembler.h"
-#include "Assembler/Exceptions/MultipleDefineException.h"
 #include "Assembler/Util.h"
 #include "Instruction.h"
 
 namespace svm {
 Assembler::Assembler(std::string const &code) : Code(code, std::ios_base::in) {}
 Assembler::Assembler(std::ifstream const &code) { Code << code.rdbuf(); }
-void Assembler::loadCode(std::string const &code) {
-  Code = std::stringstream{code, std::ios_base::in};
-}
+void Assembler::loadCode(std::string const &code) { Code = std::stringstream{code, std::ios_base::in}; }
 void Assembler::loadCode(std::ifstream const &code) { Code << code.rdbuf(); }
 
 auto Assembler::isParsable() -> bool { return Code.rdbuf()->in_avail() != 0; }
-auto Assembler::isParsed() -> bool {
-  return !Error.has_value() || Error.value() == ParseError::None;
-}
+auto Assembler::isParsed() -> bool { return !Error.has_value() || Error.value() == ParseError::None; }
 
 auto Assembler::getError() const -> std::string {
-  return fmt::format(
-      "{} at line {}",
-      magic_enum::enum_name<svm::ParseError>(Error.value_or(ParseError::None)),
-      CurrentLine);
+  return fmt::format("{} at line {}", magic_enum::enum_name<svm::ParseError>(Error.value_or(ParseError::None)),
+                     CurrentLine);
 }
 
 void Assembler::parse() {
@@ -63,7 +56,7 @@ void Assembler::parse() {
       continue;
 
     auto Label = label.to_string();
-    auto Inst = inst.to_string();
+    auto Inst  = inst.to_string();
 
     if (!handleLabel(Label))
       break;
@@ -86,16 +79,15 @@ void Assembler::writeTo(std::ostream &stream) {
     auto Pos = I.first;
     stream.seekp(static_cast<std::streamoff>(Pos * Size));
     Instruction Next{};
-    auto Op = I.second.Op;
-    auto Func = I.second.Func;
+    auto        Op   = I.second.Op;
+    auto        Func = I.second.Func;
     Next.setOp(Op);
     Next.setFunc(Func);
     auto const *Value = std::get_if<std::string>(&I.second.Value);
     if (Value == nullptr) // Value is number
       Next.setValue(std::get<int>(I.second.Value));
     else { // Value is string(label)
-      auto LabelPos =
-          tryGetPosition(std::get<std::string>(I.second.Value)).value();
+      auto LabelPos = tryGetPosition(std::get<std::string>(I.second.Value)).value_or(LABEL_PLACEHOLDER);
       switch (Op) {
       case Operator::BRANCH:
         Next.setValue(LabelPos - Pos);
@@ -127,7 +119,7 @@ auto Assembler::handleInstruction(std::string inst) -> bool {
   auto [all_op, op, operand] = INST(inst);
 
   std::variant<int, std::string> Value;
-  PreInst Res{};
+  PreInst                        Res{};
 
   auto Temp = operand.to_string();
   trim(Temp);
@@ -148,16 +140,16 @@ auto Assembler::handleInstruction(std::string inst) -> bool {
 
   Res.Value = Value;
 
-  auto Op = op.to_string();
+  auto Op   = op.to_string();
   std::transform(Op.begin(), Op.end(), Op.begin(), ::toupper);
   if (magic_enum::enum_contains<Func>(Op)) {
-    Res.Func = magic_enum::enum_cast<Func>(Op).value();
+    Res.Func = magic_enum::enum_cast<Func>(Op).value_or(Func::NONE);
     if (Op[0] == 'B')
       Res.Op = Operator::BRANCH;
     else
       Res.Op = Operator::OPERATION;
   } else if (magic_enum::enum_contains<Operator>(Op)) {
-    Res.Op = magic_enum::enum_cast<Operator>(Op).value();
+    Res.Op = magic_enum::enum_cast<Operator>(Op).value_or(Operator::NOP);
   } else {
     Error = ParseError::UnknownInstruction;
     return false;
@@ -172,8 +164,7 @@ auto Assembler::tryGetPosition(std::string const &label) -> std::optional<int> {
   return std::nullopt;
 }
 
-auto Assembler::trySetLabel(std::string const &label, int const &value)
-    -> bool {
+auto Assembler::trySetLabel(std::string const &label, int const &value) -> bool {
   if (LabelMap.contains(label)) {
     if (LabelMap.at(label) == LABEL_PLACEHOLDER)
       LabelMap.at(label) = value;
